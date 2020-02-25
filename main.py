@@ -9,6 +9,10 @@ from boltzmann_machine import *
 
 command_inputs = list(sys.argv)
 input_data = command_inputs[1]
+params = command_inputs[2]
+
+with open(params) as paramfile:
+    param = json.load(paramfile)
 
 chains = []
 losses = []
@@ -17,8 +21,7 @@ epochs = []
 # initial J (coupler values) set to one
 j_vals = [1, 1, 1, 1]
 num_epochs = 0
-learn_rate = 0.1
-loss = 1
+learn_rate = param['learn_rate']
 
 KL_div = nn.KLDivLoss()
 with open(input_data) as data:
@@ -29,7 +32,7 @@ chain_occurences = Counter(chains)
 chain_probs = np.array(list(chain_occurences.values())) / 1000
 unique_chains = np.array(list(chain_occurences.keys()))
 
-while num_epochs < 200:
+while num_epochs < param['num_epochs']:
 
     Z = partition_function(j_vals, unique_chains)
     output_probs = torch.from_numpy(np.log(probability(j_vals, unique_chains, Z)))
