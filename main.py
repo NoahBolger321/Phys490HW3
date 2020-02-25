@@ -34,15 +34,18 @@ unique_chains = np.array(list(chain_occurences.keys()))
 
 while num_epochs < param['num_epochs']:
 
+    # calculate partition function and updated probabilites
     Z = partition_function(j_vals, unique_chains)
     output_probs = torch.from_numpy(np.log(probability(j_vals, unique_chains, Z)))
     actual_probs = torch.from_numpy(chain_probs)
 
+    # store current epoch for plotting, calculate loss from updated and original probs and store
     epochs.append(num_epochs)
     losses.append(KL_div(output_probs, actual_probs))
 
     gradients = gradient(chain_probs, unique_chains, j_vals)
 
+    # update J coupler values and increase epoch counter
     j_vals += learn_rate*np.array(gradients)
     num_epochs += 1
 
@@ -59,12 +62,15 @@ output_dict = {
     "(3,0)": rounded_j_vals[3]
 }
 
+# ensure output/ exists for storage of output
 if not os.path.exists("output/"):
     os.makedirs("output/")
 
+# send output to json file
 with open('output/output.json', 'w') as f:
     json.dump(output_dict, f)
 
+# create plot of KL Divergence vs. epochs and store in output folder
 plt.plot(epochs, losses)
 plt.title("KL Divergence over Training Epochs")
 plt.ylabel("KL Divergence (loss)")

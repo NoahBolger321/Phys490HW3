@@ -26,14 +26,23 @@ def hamiltonian(j_vals, chain):
 
 
 def partition_function(j_vals, chains):
+    """
+    :return: partition function value across all spin chains
+    """
     return np.sum([np.exp(-1*hamiltonian(j_vals, c)) for c in chains])
 
 
 def probability(j_vals, chains, Z):
+    """
+    :return: Boltzmann distribution probabilities for each chain
+    """
     return [np.exp(-1*hamiltonian(j_vals, c)) / Z for c in chains]
 
 
 def expectation_value(probabilities, chains):
+    """
+    :return: expectation values for each pair of spins in the set of unique coupler chains
+    """
     storage = []
     for spin in range(4):
         spin2 = (spin + 1) % 4
@@ -42,6 +51,9 @@ def expectation_value(probabilities, chains):
 
 
 def gradient(probabilities, chains, j_vals):
+    """
+    :return: gradient/update value for training of model
+    """
     Z = partition_function(j_vals, chains)
     model_prob = probability(j_vals, chains, Z)
     pos_phase = expectation_value(probabilities, chains)
